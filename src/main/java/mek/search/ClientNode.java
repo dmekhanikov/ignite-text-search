@@ -1,6 +1,6 @@
 package mek.search;
 
-import mek.search.model.Occurrence;
+import mek.search.model.Match;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.Ignition;
 
@@ -27,10 +27,10 @@ public class ClientNode {
             searchService.add("commodo augue. Quisque nec enim laoreet");
             searchService.add("ultrices dui porta, euismod felis");
 
-            List<Occurrence> occurrences = searchService.search("et", 3);
-            for (Occurrence oc : occurrences) {
-                System.out.println("Occurrence: " + oc.getDocument().getContent() +
-                        "; num: " + oc.getNumberOfOccurrences());
+            List<Match> matches = searchService.search("et", 3);
+            for (Match match : matches) {
+                System.out.println("Match: " + match.getDocument().getContent() +
+                        "; num: " + match.getNumberOfOccurrences());
             }
         }
     }

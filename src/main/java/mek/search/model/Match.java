@@ -2,11 +2,11 @@ package mek.search.model;
 
 import org.jetbrains.annotations.NotNull;
 
-public class Occurrence implements Comparable<Occurrence> {
+public class Match implements Comparable<Match> {
     private final Document doc;
     private final int num;
 
-    public Occurrence(Document doc, int num) {
+    public Match(Document doc, int num) {
         this.doc = doc;
         this.num = num;
     }
@@ -20,7 +20,7 @@ public class Occurrence implements Comparable<Occurrence> {
     }
 
     @Override
-    public int compareTo(@NotNull Occurrence o) {
+    public int compareTo(@NotNull Match o) {
         if (num != o.num) {
             return Integer.compare(num, o.num);
         } else {

@@ -1,7 +1,7 @@
 package mek.search;
 
 import mek.search.model.Document;
-import mek.search.model.Occurrence;
+import mek.search.model.Match;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
 import org.apache.ignite.cache.query.Query;
@@ -40,8 +40,8 @@ public class TextSearchServiceImpl implements TextSearchService, Service {
     }
 
     @Override
-    public List<Occurrence> search(String qryText, int limit) {
-        LinkedList<Occurrence> result = new LinkedList<>();
+    public List<Match> search(String qryText, int limit) {
+        LinkedList<Match> result = new LinkedList<>();
 
         Query<Cache.Entry<UUID, Document>> qry = new ScanQuery<>((k, v) -> v.getContent().contains(qryText));
 
@@ -49,8 +49,8 @@ public class TextSearchServiceImpl implements TextSearchService, Service {
             for (Cache.Entry<UUID, Document> e : cursor) {
                 Document doc = e.getValue();
                 int num = countOccurrencesOf(doc.getContent(), qryText);
-                Occurrence oc = new Occurrence(doc, num);
-                insert(result, oc, limit);
+                Match match = new Match(doc, num);
+                insert(result, match, limit);
             }
         }
 
@@ -72,11 +72,11 @@ public class TextSearchServiceImpl implements TextSearchService, Service {
         return count;
     }
 
-    private void insert(LinkedList<Occurrence> list, Occurrence oc, int limit) {
-        ListIterator<Occurrence> it = list.listIterator();
+    private void insert(LinkedList<Match> list, Match oc, int limit) {
+        ListIterator<Match> it = list.listIterator();
         boolean found = false;
         for (int i = 0; i < limit && it.hasNext(); i++) {
-            Occurrence oc1 = it.next();
+            Match oc1 = it.next();
             if (oc1.compareTo(oc) < 0) {
                 if (i == 0) {
                     list.addFirst(oc);
