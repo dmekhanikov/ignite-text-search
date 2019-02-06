@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.UUID;
 
+import static org.springframework.util.StringUtils.countOccurrencesOf;
+
 public class TextSearchServiceImpl implements TextSearchService, Service {
     private static final String CACHE_NAME = "documents";
 
@@ -55,21 +57,6 @@ public class TextSearchServiceImpl implements TextSearchService, Service {
         }
 
         return result;
-    }
-
-    private int countOccurrencesOf(String str, String sub) {
-        if (str.isEmpty() || sub.isEmpty()) {
-            return 0;
-        }
-
-        int count = 0;
-        int pos = 0;
-        int idx;
-        while ((idx = str.indexOf(sub, pos)) != -1) {
-            ++count;
-            pos = idx + sub.length();
-        }
-        return count;
     }
 
     private void insert(LinkedList<Match> list, Match oc, int limit) {
