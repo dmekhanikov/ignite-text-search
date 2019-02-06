@@ -2,6 +2,7 @@ package mek.search;
 
 import mek.search.model.Document;
 import mek.search.model.Match;
+import mek.search.model.Request;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
 import org.apache.ignite.cache.query.Query;
@@ -12,20 +13,24 @@ import org.apache.ignite.services.Service;
 import org.apache.ignite.services.ServiceContext;
 
 import javax.cache.Cache;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.UUID;
+import java.util.*;
 
 import static org.springframework.util.StringUtils.countOccurrencesOf;
 
 public class TextSearchServiceImpl implements TextSearchService, Service {
     private static final String CACHE_NAME = "documents";
 
+    private static final long CACHE_LIFE_TIME = 60_000;
+
+    private static final int CACHE_MAX_SIZE = 50_000;
+
     @IgniteInstanceResource
     private Ignite ignite;
 
     private IgniteCache<UUID, Document> documentsCache;
+
+    private final Map<Request, LinkedList<Match>> localRequestCache =
+            Collections.synchronizedMap(new LinkedHashMap<>());
 
     @Override
     public Document add(String text) {
@@ -43,7 +48,15 @@ public class TextSearchServiceImpl implements TextSearchService, Service {
 
     @Override
     public List<Match> search(String qryText, int limit) {
-        LinkedList<Match> result = new LinkedList<>();
+        Request req = new Request(qryText, limit, System.currentTimeMillis());
+
+        LinkedList<Match> result = localRequestCache.get(req);
+
+        if (result != null) {
+            return result;
+        }
+
+        result = new LinkedList<>();
 
         Query<Cache.Entry<UUID, Document>> qry = new ScanQuery<>((k, v) -> v.getContent().contains(qryText));
 
@@ -55,6 +68,9 @@ public class TextSearchServiceImpl implements TextSearchService, Service {
                 insert(result, match, limit);
             }
         }
+
+        if (localRequestCache.size() < CACHE_MAX_SIZE)
+            localRequestCache.put(req, result);
 
         return result;
     }
@@ -88,12 +104,27 @@ public class TextSearchServiceImpl implements TextSearchService, Service {
     }
 
     @Override
-    public void cancel(ServiceContext serviceContext) {
-        // No op.
+    public void execute(ServiceContext serviceContext) throws InterruptedException {
+        while (!serviceContext.isCancelled()) {
+            synchronized (localRequestCache) {
+                Iterator<Map.Entry<Request, LinkedList<Match>>> it = localRequestCache.entrySet().iterator();
+
+                while (it.hasNext()) {
+                    Request req = it.next().getKey();
+                    if (req.getTimestamp() + CACHE_LIFE_TIME >= System.currentTimeMillis()) {
+                        it.remove();
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            Thread.sleep(CACHE_LIFE_TIME);
+        }
     }
 
     @Override
-    public void execute(ServiceContext serviceContext) {
+    public void cancel(ServiceContext serviceContext) {
         // No op.
     }
 }
