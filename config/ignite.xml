@@ -30,5 +30,7 @@
         </property>
 
         <property name="workDirectory" value="#{systemEnvironment['HOME']}/.ignite/"/>
+
+        <property name="metricsLogFrequency" value="0"/>
     </bean>
 </beans>
