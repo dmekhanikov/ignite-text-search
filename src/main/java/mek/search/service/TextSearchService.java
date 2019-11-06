@@ -10,5 +10,6 @@ public interface TextSearchService {
     int DEFAULT_LIMIT = 5;
 
     Document add(String text);
+    List<Document> addAll(List<String> lines);
     List<Match> search(String query, int limit);
 }

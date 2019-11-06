@@ -5,6 +5,7 @@ import mek.search.model.Match;
 import mek.search.model.Request;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
+import org.apache.ignite.IgniteDataStreamer;
 import org.apache.ignite.IgniteLogger;
 import org.apache.ignite.cache.query.Query;
 import org.apache.ignite.cache.query.QueryCursor;
@@ -40,16 +41,35 @@ public class TextSearchServiceImpl implements TextSearchService, Service {
 
     @Override
     public Document add(String text) {
+        Document doc = createDocument(text);
+
+        documentsCache.put(doc.getId(), doc);
+
+        return doc;
+    }
+
+    @Override
+    public List<Document> addAll(List<String> lines) {
+        List<Document> docs = new ArrayList<>(lines.size());
+
+        try (IgniteDataStreamer<UUID, Document> streamer = ignite.dataStreamer(CACHE_NAME)) {
+            for (String line : lines) {
+                Document doc = createDocument(line);
+                streamer.addData(doc.getId(), doc);
+                docs.add(doc);
+            }
+        }
+
+        return docs;
+    }
+
+    private Document createDocument(String text) {
         UUID id = UUID.randomUUID();
 
-        Document doc = new Document(
+        return new Document(
                 id,
                 text,
                 System.currentTimeMillis());
-
-        documentsCache.put(id, doc);
-
-        return doc;
     }
 
     @Override
