@@ -1,12 +1,13 @@
 package mek.search;
 
 import mek.search.model.Match;
+import mek.search.service.TextSearchService;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.Ignition;
 
 import java.util.List;
 
-public class ClientNode {
+public class LoadNode {
     public static void main(String[] args) {
         Ignition.setClientMode(true);
         try (Ignite client = Ignition.start("config/ignite.xml")) {

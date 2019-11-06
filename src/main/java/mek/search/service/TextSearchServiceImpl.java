@@ -1,4 +1,4 @@
-package mek.search;
+package mek.search.service;
 
 import mek.search.model.Document;
 import mek.search.model.Match;
