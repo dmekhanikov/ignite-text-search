@@ -33,8 +33,10 @@ public class LoadNode {
 
                 lines.add(line);
 
-                if (lines.size() == LOAD_BATCH_SIZE)
+                if (lines.size() == LOAD_BATCH_SIZE) {
                     searchService.addAll(lines);
+                    lines.clear();
+                }
             }
 
             if (!lines.isEmpty())
