@@ -28,5 +28,7 @@
                 <constructor-arg name="cfgFile" value="config/ignite-log4j2.xml"/>
             </bean>
         </property>
+
+        <property name="workDirectory" value="#{systemEnvironment['HOME']}/.ignite/"/>
     </bean>
 </beans>
