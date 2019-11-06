@@ -11,7 +11,7 @@ public class DeployNode {
         Ignition.setClientMode(true);
         try (Ignite client = Ignition.start("config/ignite.xml")) {
             client.services().deployNodeSingleton(TextSearchService.SERVICE_NAME, new TextSearchServiceImpl());
-            client.services().deployClusterSingleton("rest-service", new RestEndpointService());
+            client.services().deployClusterSingleton(RestEndpointService.SERVICE_NAME, new RestEndpointService());
         }
     }
 }

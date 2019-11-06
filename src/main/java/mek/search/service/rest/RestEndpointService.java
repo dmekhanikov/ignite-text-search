@@ -9,6 +9,8 @@ import org.apache.ignite.services.ServiceContext;
 import org.eclipse.jetty.server.Server;
 
 public class RestEndpointService implements Service {
+    public static final String SERVICE_NAME = "rest-service";
+
     @IgniteInstanceResource
     private Ignite ignite;
 
