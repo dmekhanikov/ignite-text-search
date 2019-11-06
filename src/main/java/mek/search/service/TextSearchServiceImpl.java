@@ -5,11 +5,13 @@ import mek.search.model.Match;
 import mek.search.model.Request;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
+import org.apache.ignite.IgniteLogger;
 import org.apache.ignite.cache.query.Query;
 import org.apache.ignite.cache.query.QueryCursor;
 import org.apache.ignite.cache.query.ScanQuery;
 import org.apache.ignite.configuration.CacheConfiguration;
 import org.apache.ignite.resources.IgniteInstanceResource;
+import org.apache.ignite.resources.LoggerResource;
 import org.apache.ignite.services.Service;
 import org.apache.ignite.services.ServiceContext;
 
@@ -27,6 +29,9 @@ public class TextSearchServiceImpl implements TextSearchService, Service {
 
     @IgniteInstanceResource
     private Ignite ignite;
+
+    @LoggerResource
+    private IgniteLogger log;
 
     private IgniteCache<UUID, Document> documentsCache;
 
@@ -102,6 +107,8 @@ public class TextSearchServiceImpl implements TextSearchService, Service {
     @Override
     public void init(ServiceContext serviceContext) {
         documentsCache = ignite.getOrCreateCache(cacheConfiguration());
+
+        log.info("Text search service has been initialized.");
     }
 
     private CacheConfiguration<UUID, Document> cacheConfiguration() {
