@@ -23,13 +23,9 @@
             </bean>
         </property>
 
-        <property name="serviceConfiguration">
-            <bean class="org.apache.ignite.services.ServiceConfiguration">
-                <property name="name" value="search-service"/>
-                <property name="service">
-                    <bean class="mek.search.TextSearchServiceImpl"/>
-                </property>
-                <property name="maxPerNodeCount" value="1"/>
+        <property name="gridLogger">
+            <bean class="org.apache.ignite.logger.log4j2.Log4J2Logger">
+                <constructor-arg name="cfgFile" value="config/ignite-log4j2.xml"/>
             </bean>
         </property>
     </bean>
