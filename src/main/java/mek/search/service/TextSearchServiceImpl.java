@@ -60,6 +60,8 @@ public class TextSearchServiceImpl implements TextSearchService, Service {
             }
         }
 
+        log.info("Loaded " + docs.size() + " documents.");
+
         return docs;
     }
 
